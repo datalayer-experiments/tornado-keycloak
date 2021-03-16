@@ -1,0 +1,12 @@
+.*
+*.egg-info
+__pycache__
+build
+dist
+
+!.*ignore
+!.*rc
+!.*rc.js
+!.*config
+!.datalayer
+!.github

@@ -1,0 +1,11 @@
+name: tornado-oidc
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - pip
+  - pycurl
+  - pytest
+  - python=3.9
+  - tornado
+  - twine

@@ -19,7 +19,7 @@ default: help ## default target is help.
 conda: ## create a conda environment
 	($(CONDA); \
 		conda deactivate && \
-			conda remove -y --all -n tornado-oidc && \
+			conda remove -y --all -n tornado-keycloak && \
 		conda env create -f environment.yml )
 
 clean:
@@ -28,7 +28,7 @@ clean:
 	rm -fr dist
 
 install:
-	($(CONDA_ACTIVATE) tornado-oidc; \
+	($(CONDA_ACTIVATE) tornado-keycloak; \
 		python setup.py install )
 
 keycloak-rm: ## Remove any existing keycloak container.
@@ -51,6 +51,6 @@ keycloak-init:
 	docker exec -it keycloak /tmp/keycloak/init-keycloak.sh
 
 start:
-	($(CONDA_ACTIVATE) tornado-oidc; \
+	($(CONDA_ACTIVATE) tornado-keycloak; \
 		echo open http://localhost:8080 && \
 		python main.py )

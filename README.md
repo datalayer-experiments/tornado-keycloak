@@ -1,6 +1,6 @@
 [![Datalayer](https://raw.githubusercontent.com/datalayer/datalayer/main/res/logo/datalayer-25.svg?sanitize=true)](https://datalayer.io)
 
-# Datalayer Experiments with Tornado OpenID Connect
+# Datalayer Experiments with Tornado Keycloak
 
 ![status](https://img.shields.io/badge/Project_Stability-ALPHA-red.svg)
 
@@ -8,7 +8,7 @@
 
 This folder contains an [OpenID Connect](https://openid.net/connect) (OIDC) authentication handler for the Python [Tornado](https://www.tornadoweb.org) Web server (read more on [Tornado authentication](https://www.tornadoweb.org/en/stable/auth.html)).
 
-We use here [Keycloak](https://www.keycloak.org) as OIDC provider. If you face issue with another OIDC provider (Google...), please open an [issue](https://github.com/datalayer-experiments/tornado-oidc/issues).
+We use here [Keycloak](https://www.keycloak.org) as OIDC provider. If you face issue with another OIDC provider (Google...), please open an [issue](https://github.com/datalayer-experiments/tornado-keycloak/issues).
 
 ## Environment
 
@@ -16,8 +16,8 @@ To develop on the source code, we recommend using [Miniconda](https://docs.conda
 
 ```bash
 # Clone, install and browse the storybook.
-git clone https://github.com/datalayer-experiments/tornado-oidc.git &&
-  cd tornado-oidc && \
+git clone https://github.com/datalayer-experiments/tornado-keycloak.git &&
+  cd tornado-keycloak && \
   make conda \
        install
 ```

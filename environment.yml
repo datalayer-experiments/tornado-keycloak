@@ -1,4 +1,4 @@
-name: tornado-oidc
+name: tornado-keycloak
 channels:
   - conda-forge
   - defaults

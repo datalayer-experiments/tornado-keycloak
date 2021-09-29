@@ -1,21 +1,22 @@
-import binascii, hashlib, hmac, time, urllib.parse, uuid
-import tornado, jwt, json, base64, os.path
+import json
+import os.path
+import urllib.parse
+# from typing import cast
+from typing import Any, Dict
 
-from tornado import httpserver, ioloop, web, options, gen, web, httpclient, escape
-from tornado.auth import OpenIdMixin, OAuth2Mixin
-from tornado.httpclient import HTTPRequest, AsyncHTTPClient
-from tornado.httputil import url_concat
-from tornado.util import unicode_type
-from tornado.web import RequestHandler
-
+import jwt
+import tornado
 from jwt.algorithms import RSAAlgorithm
+from tornado import escape, web
+# from tornado import httpclient
+from tornado.auth import OAuth2Mixin
+from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 
-from typing import Any, Dict, cast
 
 class KeycloakMixin(OAuth2Mixin):
 
     oidc_server_host = os.getenv('OIDC_SERVER')
-    oidc_client_id = os.getenv('OIDC_CLIENT_ID')    
+    oidc_client_id = os.getenv('OIDC_CLIENT_ID')
 
     _OAUTH_AUTHORIZE_URL = "{}/auth/realms/{}/protocol/openid-connect/auth".format(oidc_server_host, oidc_client_id)
     _OAUTH_ACCESS_TOKEN_URL = "{}/auth/realms/{}/protocol/openid-connect/token".format(oidc_server_host, oidc_client_id)
@@ -28,7 +29,7 @@ class KeycloakMixin(OAuth2Mixin):
     async def get_authenticated_user(
         self, redirect_uri: str, code: str
     ) -> Dict[str, Any]:
-        oidc_client_id = os.getenv('OIDC_CLIENT_ID')    
+        oidc_client_id = os.getenv('OIDC_CLIENT_ID')
 #        handler = cast(RequestHandler, self)
         http = self.get_auth_http_client()
         body = urllib.parse.urlencode(
@@ -46,7 +47,8 @@ class KeycloakMixin(OAuth2Mixin):
             headers={"Content-Type": "application/x-www-form-urlencoded"},
             body=body,
         )
-        return escape.json_decode(response.body) 
+        return escape.json_decode(response.body)
+
 
 class OidcLoginHandler(tornado.web.RequestHandler, KeycloakMixin):
     async def get(self):
@@ -56,20 +58,20 @@ class OidcLoginHandler(tornado.web.RequestHandler, KeycloakMixin):
             access = await self.get_authenticated_user(
                 redirect_uri='http://localhost:{}/login'.format(self.application.settings['port']),
                 code=self.get_argument('code')
-                )
-#            print('access: {}'.format(access))
+            )
+            # print('access: {}'.format(access))
             access_token = access['access_token']
             if not access_token:
                 raise web.HTTPError(400, "failed to get access token")
-#            print('oauth token: %r', access_token)
+            # print('oauth token: %r', access_token)
             user_info_req = HTTPRequest(
                 KeycloakMixin._OAUTH_USERINFO_URL,
                 method="GET",
                 headers={
                     "Accept": "application/json",
                     "Authorization": "Bearer {}".format(access_token)
-                    },
-                )
+                },
+            )
             http_client = AsyncHTTPClient()
             user_info_res = await http_client.fetch(user_info_req)
             user_info_res_json = json.loads(user_info_res.body.decode('utf8', 'replace'))
@@ -101,7 +103,8 @@ class OidcLoginHandler(tornado.web.RequestHandler, KeycloakMixin):
                 scope=['profile', 'email'],
                 response_type='code',
                 extra_params={'approval_prompt': 'auto'}
-                )
+            )
+
 
 class JwkRequestHandler(web.RequestHandler):
 
@@ -138,16 +141,17 @@ class JwkRequestHandler(web.RequestHandler):
                 public_key = RSAAlgorithm.from_jwk(json.dumps(jwk['keys'][0]))
                 payload = jwt.decode(bearer, public_key, algorithms='RS256', options={'verify_aud': False})
             else:
-                raise ValueError(response.body.decode('utf-8')) 
+                raise ValueError(response.body.decode('utf-8'))
 #            httpclient.HTTPClient().close()
         except jwt.ExpiredSignatureError:
             raise web.HTTPError(401, reason='Unauthorized')
         print(payload)
         return payload
 
+
 class JwkHandler(JwkRequestHandler):
-  #  @web.authenticated
+    # @web.authenticated
     async def get(self):
-#        self.write('Hi ' + self.current_user['preferred_username'])
+        # self.write('Hi ' + self.current_user['preferred_username'])
         await self.get_current_user()
         self.redirect(self.reverse_url("main"))

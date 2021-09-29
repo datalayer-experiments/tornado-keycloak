@@ -36,7 +36,7 @@ class Application(tornado.web.Application):
             'static_path': os.path.join(base_dir, "static"),
             'debug': True,
             "xsrf_cookies": True,
-            "open_id_certs_url": 'http://{}/auth/realms/{}/protocol/openid-connect/certs'.format(os.getenv('OIDC_SERVER'), os.getenv('OIDC_CLIENT_REALM')),
+            "open_id_certs_url": '{}/auth/realms/{}/protocol/openid-connect/certs'.format(os.getenv('OIDC_SERVER'), os.getenv('OIDC_CLIENT_REALM')),
             "cookie_secret": "bZJc2sWbQLKos6GkHn/VB9oXwQt8S0R0kRvJ5/xJ89E=",
             "port": options.port,
         }

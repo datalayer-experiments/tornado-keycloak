@@ -60,6 +60,7 @@ Copy the printed `export` variables and paste them in your terminal so that the 
 
 ```
 export OIDC_CLIENT_ID=datalayer
+export OIDC_REALM=master
 export OIDC_SECRET=<secret>
 export OIDC_SERVER=http://localhost:8092
 ```

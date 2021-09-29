@@ -16,6 +16,7 @@ echo
 echo -e "\x1b[32mCopy/Paste the following exports and run them in your shell\x1b[0m"
 echo
 echo export OIDC_CLIENT_ID=datalayer
+echo export OIDC_REALM=master
 echo export OIDC_SECRET=$OIDC_SECRET
 echo export OIDC_SERVER=http://localhost:8092
 echo

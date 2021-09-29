@@ -16,12 +16,13 @@ from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 class KeycloakMixin(OAuth2Mixin):
 
     oidc_server_host = os.getenv('OIDC_SERVER')
+    oidc_realm = os.getenv('OIDC_CLIENT_REALM')
     oidc_client_id = os.getenv('OIDC_CLIENT_ID')
 
-    _OAUTH_AUTHORIZE_URL = "{}/auth/realms/{}/protocol/openid-connect/auth".format(oidc_server_host, oidc_client_id)
-    _OAUTH_ACCESS_TOKEN_URL = "{}/auth/realms/{}/protocol/openid-connect/token".format(oidc_server_host, oidc_client_id)
-    _OAUTH_LOGOUT_URL = "{}/auth/realms/{}/protocol/openid-connect/logout".format(oidc_server_host, oidc_client_id)
-    _OAUTH_USERINFO_URL = "{}/auth/realms/{}/protocol/openid-connect/userinfo".format(oidc_server_host, oidc_client_id)
+    _OAUTH_AUTHORIZE_URL = "{}/auth/realms/{}/protocol/openid-connect/auth".format(oidc_server_host, oidc_realm)
+    _OAUTH_ACCESS_TOKEN_URL = "{}/auth/realms/{}/protocol/openid-connect/token".format(oidc_server_host, oidc_realm)
+    _OAUTH_LOGOUT_URL = "{}/auth/realms/{}/protocol/openid-connect/logout".format(oidc_server_host, oidc_realm)
+    _OAUTH_USERINFO_URL = "{}/auth/realms/{}/protocol/openid-connect/userinfo".format(oidc_server_host, oidc_realm)
 
 #    _OAUTH_NO_CALLBACKS = False
 #    _OAUTH_SETTINGS_KEY = ""

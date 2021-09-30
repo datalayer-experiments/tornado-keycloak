@@ -89,3 +89,7 @@ make keycloak-rm
 ## TODO
 
 - [ ] Logout: Call OIDC API on Logout.
+
+## License
+
+[MIT License](./LICENSE)

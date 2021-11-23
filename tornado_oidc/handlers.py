@@ -64,6 +64,7 @@ class OidcLoginHandler(tornado.web.RequestHandler, KeycloakMixin):
             access_token = access['access_token']
             if not access_token:
                 raise web.HTTPError(400, "failed to get access token")
+            refresh_token = access['refresh_token']
             # print('oauth token: %r', access_token)
             user_info_req = HTTPRequest(
                 KeycloakMixin._OAUTH_USERINFO_URL,
@@ -73,11 +74,12 @@ class OidcLoginHandler(tornado.web.RequestHandler, KeycloakMixin):
                     "Authorization": "Bearer {}".format(access_token)
                 },
             )
-            http_client = AsyncHTTPClient()
+            http_client = self.get_auth_http_client()
             user_info_res = await http_client.fetch(user_info_req)
             user_info_res_json = json.loads(user_info_res.body.decode('utf8', 'replace'))
             self.set_secure_cookie("user", user_info_res_json['preferred_username'])
             self.set_secure_cookie("token", access_token)
+            self.set_secure_cookie("refresh", refresh_token)
             """
             user = await self.oauth2_request(
                 url=KeycloakMixin._OAUTH_USERINFO_URL,
@@ -105,6 +107,40 @@ class OidcLoginHandler(tornado.web.RequestHandler, KeycloakMixin):
                 response_type='code',
                 extra_params={'approval_prompt': 'auto'}
             )
+
+
+class OidcLogoutHandler(tornado.web.RequestHandler, KeycloakMixin):
+
+    async def get(self):
+        bearer = self.get_secure_cookie("token")
+        if not bearer:
+            raise web.HTTPError(401, reason='Unauthorized')
+        bearer = bearer.decode("UTF-8")
+        refresh_token = self.get_secure_cookie("refresh")
+        if refresh_token:
+            refresh_token = refresh_token.decode("UTF-8")
+
+        body = urllib.parse.urlencode({
+            "client_id": os.getenv('OIDC_CLIENT_ID'),
+            "client_secret": os.getenv('OIDC_SECRET'),
+            "refresh_token": refresh_token,
+        })
+
+        logout_req = HTTPRequest(
+            KeycloakMixin._OAUTH_LOGOUT_URL,
+            method="POST",
+            headers={
+                "Accept": "application/json",
+                "Authorization": "Bearer {}".format(bearer)
+            },
+            body=body,
+        )
+        http_client = self.get_auth_http_client()
+        logout_res = await http_client.fetch(logout_req)
+        assert 200 <= logout_res.code < 300
+        self.clear_cookie("user")
+        self.clear_cookie("token")
+        self.redirect(self.get_argument("next", self.reverse_url("main")))
 
 
 class JwkRequestHandler(web.RequestHandler):

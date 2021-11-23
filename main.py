@@ -5,7 +5,7 @@ import os.path
 import tornado
 from tornado.options import define, options
 
-from tornado_oidc.handlers import OidcLoginHandler, JwkHandler
+from tornado_oidc.handlers import OidcLoginHandler, OidcLogoutHandler, JwkHandler
 
 define("port", default=8080, help="run on the given port", type=int)
 
@@ -19,12 +19,6 @@ class MainHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
         self.render('index.html')
-
-
-class LogoutHandler(BaseHandler):
-    def get(self):
-        self.clear_cookie("user")
-        self.redirect(self.get_argument("next", self.reverse_url("main")))
 
 
 class Application(tornado.web.Application):
@@ -43,7 +37,7 @@ class Application(tornado.web.Application):
         tornado.web.Application.__init__(self, [
             tornado.web.url(r"/", MainHandler, name="main"),
             tornado.web.url(r'/login', OidcLoginHandler, name="login"),
-            tornado.web.url(r'/logout', LogoutHandler, name="logout"),
+            tornado.web.url(r'/logout', OidcLogoutHandler, name="logout"),
             tornado.web.url(r"/jwk", JwkHandler, name="jwk"),
         ], **settings)
 
